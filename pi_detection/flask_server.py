@@ -12,10 +12,12 @@ class Flask_Server:
             while True:
                 if not queue1.empty():
                     msg = queue1.get()
-                    break
+                    queue1.empty()
+                    return msg
+                    
             
                     
-            return msg
+            
 
 
         @app.route("/about")

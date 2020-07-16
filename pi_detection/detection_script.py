@@ -41,7 +41,7 @@ class Detector:
         input_width = input_details[0]['shape'][2]
 
         # Initialise the videostream 
-       # vs = VideoStream().start()
+        # vs = VideoStream().start()
         frame_rate_calc = 1
         freq = cv2.getTickFrequency()
         print('picam time')
@@ -74,7 +74,7 @@ class Detector:
             boxes = interpreter.get_tensor(output_details[0]['index'])[0]
             classes = interpreter.get_tensor(output_details[1]['index'])[0]
             scores = interpreter.get_tensor(output_details[2]['index'])[0]
-            #Draw boxes and labels on frame   # Credit to pyimagesearch
+            #Draw boxes and labels on frame   # Credit to pyimagesearch.com
             for i in range(0, len(classes)):
                 if scores[i] > 0.6:
                     box = boxes[i]
@@ -85,11 +85,16 @@ class Detector:
                     cv2.rectangle(frame, (left, top), (right, bottom), colour_list[prediction_index], 2)
                     cv2.putText(frame, label, (left, top-5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, colour_list[prediction_index], 2)
+                    queue1.put(label)
+                    
             cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
 
             cv2.imshow('frame', frame)
             t2 = cv2.getTickCount()
             t2 = (t2-t1)/freq
+
+            
+
             frame_rate_calc = 1/t2
 
             rawCapture.truncate(0)
