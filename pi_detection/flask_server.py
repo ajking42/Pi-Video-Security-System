@@ -1,22 +1,28 @@
 from flask import Flask
-from datetime import datetime
 
 
-class Flask_Server:
+class Flask_Server: 
 
-
-    def start_server(self, q1, q2):
+    def start(self, queue1, queue2):
         app = Flask(__name__)
-
-        @app.route('/')
-        def index():
-            return 'This server is doing stuff lol'
+        @app.route("/")
+        @app.route("/home")
+        def home():
+            msg = 'server running'
+            while True:
+                if not queue1.empty():
+                    msg = queue1.get()
+                    break
             
-        def process_detection(self, detection):
-                    @app.route('/')
-                        def index():
-                            return '{} detected at {}'.format(detection, datetime.now())
-        if __name__ == '__main__':
-            app.run(debug=True, host='0.0.0.0')
+                    
+            return msg
 
-    
+
+        @app.route("/about")
+        def about():
+            return "<h1>About Page</h1>"
+
+
+        app.run(host='0.0.0.0')
+
+
