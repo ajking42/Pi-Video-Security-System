@@ -14,7 +14,7 @@ class Detector:
     def start(self, queue1, queue2):
         queue1.put('message from detector!')
         # Path to frozen detection graph. This is the actual model that is used for the object detection.
-        MODEL_NAME = 'ssd_mobilenet_v3_large_coco_2020_01_14'
+        MODEL_NAME = 'ssd_mobilenet_v3_small_coco_2020_01_14'
         PATH_TO_CKPT = MODEL_NAME + '/model.tflite'
 
         # List of the strings that is used to add correct label for each box.
@@ -86,13 +86,16 @@ class Detector:
                     cv2.putText(frame, label, (left, top-5),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, colour_list[prediction_index], 2)
                     queue1.put(label)
+                    queue2.put(frame)
+
+
                     
             cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
 
             cv2.imshow('frame', frame)
             t2 = cv2.getTickCount()
             t2 = (t2-t1)/freq
-
+            
             
 
             frame_rate_calc = 1/t2
