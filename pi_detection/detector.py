@@ -48,7 +48,7 @@ class Detector:
         
 
     def detect(self): 
-         # Initialise the videostream 
+        # Initialise the videostream 
         print('Initilising PiCamera')
         camera = PiCamera()
         camera.resolution = (self.input_width, self.input_height)
@@ -69,6 +69,8 @@ class Detector:
             # Prepare frame for inference
             resized_frame = cv2.resize(frame, (self.input_width, self.input_height))
             image_np_expanded = np.expand_dims(resized_frame, axis=0)
+
+
             # Run inference
             self.interpreter.set_tensor(self.input_details[0]['index'], image_np_expanded)
             self.interpreter.invoke()
@@ -92,36 +94,33 @@ class Detector:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.colour_list[prediction_index], 2)
                     
                     #Only save and send frames in list of desired categories
-                    if(label_category in self.desired_categories):
-                        frame_time = datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
-                        
-                        detection = {
-                        'time': frame_time,
-                        'label': label,
-                        }
+                    #TODO: have stream at higher resolution and save frames at this resolution for viewing
 
+                    if(label_category in self.desired_categories):
+
+                        # Include date and time of detection in file name
+                        frame_time = datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
                         frame_file_name = f'detection_storage/{frame_time} - {label}.png'
-                        print(frame_file_name)
 
                         cv2.imwrite(frame_file_name, frame)
 
                         
-                        self.queue1.put(label)
                         
-
+            # Adds fps to stream, but not to saved frames
             cv2.putText(frame,"FPS: {0:.2f}".format(frame_rate_calc),(30,50),cv2.FONT_HERSHEY_SIMPLEX,1,(255,255,0),2,cv2.LINE_AA)
 
+            #Show the frame - TODO: to be taken out in file implementation
             cv2.imshow('frame', frame)
+
+            #Calculate fps
             t2 = cv2.getTickCount()
             t2 = (t2-t1)/freq
             frame_rate_calc = 1/t2
 
+            #Reset picamera
             rawCapture.truncate(0)
             
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 cv2.destroyAllWindows()
-                break
-
-    def return_string():
-        print('blah')            
+                break           
 
