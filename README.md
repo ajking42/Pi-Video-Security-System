@@ -3,7 +3,7 @@
 ### (Work-In-Progress)
 
 This repository contains the server and video side of an object-detecting video surveillance system that is designed to run on the Raspberry Pi 4B with the
-official Pi Camera Module V2. The project is part of a currently ongoing dissertation and is therefore a work in progress. It will also include an Android client.
+official Pi Camera Module V2. The project is part of a currently ongoing dissertation and is therefore a work in progress. It will also include an Android client which can be seen at https://github.com/ajking42/Pi-Video-Security-System-Android.
 
 ## Goals
 
