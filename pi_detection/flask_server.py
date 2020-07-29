@@ -1,9 +1,10 @@
-from flask import Flask, send_file, jsonify, request
+from flask import Flask, send_file, jsonify, request, Response, render_template
 from PIL import Image
 import io
 import time
 import os
 from stat import S_ISREG, ST_CTIME, ST_MODE
+from cv2 import imencode
 
 class Flask_Server: 
 
@@ -52,5 +53,23 @@ class Flask_Server:
 
             return send_file(image_path, mimetype='image/PNG')
 
+            
+
+        @app.route("/streaming")
+        def streaming():
+            return Response(get_frame(),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+        
+        def get_frame():
+            while True:
+                if not queue1.empty():
+                    frame = queue1.get()
+                    ret, frame_en = imencode(".jpg", frame)
+                    yield (b'--frame\r\n' 
+                        b'Content-Type: image/jpeg\r\n\r\n' + bytearray(frame_en) + b'\r\n')
+
+        
 
         app.run(host='0.0.0.0')
+
