@@ -23,22 +23,18 @@ class Flask_Server:
             
             detection_dir_path = 'detection_storage/'
 
-            detection_file_names = []
+            detection_file_names = os.listdir(detection_dir_path)
 
-            # Get a list of all files in /detection_storage, and their statuses
-            data = (os.path.join(detection_dir_path, fn) for fn in os.listdir(detection_dir_path))
-            data = ((os.stat(path), path) for path in data)
-
-            # Get creation dates for each file
-            data = ((stat[ST_CTIME], path)
-                    for stat, path in data if S_ISREG(stat[ST_MODE]))
-
-            #Sort files by creation date, then append the path name to detection_file_names
-            for cdate, path in sorted(data):
-                detection_file_names.append(os.path.basename(path))
+            # get file creation dates
+            frames = ((os.path.getctime(f'{detection_dir_path}{frame}'), frame) for frame in detection_file_names)
             
-            # Return jsonified list of sorted file names
-            return jsonify(detection_file_names)
+            sorted_detections = []
+
+            # sort file names by creation date
+            for date, frame in sorted(frames):
+                sorted_detections.append(frame)
+
+            return jsonify(sorted_detections)
 
 
         

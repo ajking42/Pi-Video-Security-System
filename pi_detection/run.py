@@ -25,6 +25,6 @@ if __name__ == '__main__':
     flask_process.start()
     
     #Start detector
-    detector.detect()
+    detector.detect(False)
     flask_process.join()
 
