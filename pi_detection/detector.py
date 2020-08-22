@@ -86,7 +86,7 @@ class Detector:
                 avg_fps = sum(frame_rate_list)/len(frame_rate_list)
                 print(avg_fps)
                 frame_rate_list = []
-                out = cv2.VideoWriter(f'video_storage/{datetime.now().strftime("%m-%d-%Y, %H:%M:%S")}.mp4',cv2.VideoWriter_fourcc('m','p','4','v'), avg_fps, (self.input_width,self.input_height))
+                out = cv2.VideoWriter(f'video_storage/{datetime.now().strftime("%m-%d-%Y, %H:%M:%S")}.mp4',cv2.VideoWriter_fourcc('H','E','V','C'), avg_fps, (self.input_width,self.input_height))
 
             
             
@@ -131,6 +131,9 @@ class Detector:
 
                         self.saveFrame(frame_file_name, frame)
 
+
+                        # Put category into notification queue
+                        self.queue2.put(label_category)
                         
             recorded_frame = frame.copy()
             # Adds fps to stream, but not to saved frames
@@ -218,6 +221,5 @@ class Detector:
         VideoWriter.release()
 
         
-
 
 
