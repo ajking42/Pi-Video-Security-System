@@ -2,6 +2,7 @@ import numpy as np
 import tflite_runtime.interpreter as tflite
 import cv2
 import os
+import yaml
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as vis_util
 from picamera.array import PiRGBArray
@@ -12,15 +13,23 @@ import time
 from datetime import datetime
 
 class Detector:
-    desired_categories = ['person', 'dog', 'laptop','tv']
+    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)  
+
+    
     
 
     def __init__(self, q1, q2):
+
+       
+
+        # Initialise Queues          
         self.queue1 = q1
         self.queue2 = q2
+        
         print('Initialising detector')
         # Path to frozen detection graph. This is the actual model that is used for the object detection.
-        MODEL_NAME = 'ssd_mobilenet_v3_small_coco_2020_01_14'
+        MODEL_NAME = self.config['model_preference']
+        print(F'Running model: {MODEL_NAME}')
         PATH_TO_CKPT = MODEL_NAME + '/model.tflite'
 
         # List of the strings that is used to add correct label for each box.
@@ -123,7 +132,7 @@ class Detector:
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, self.colour_list[prediction_index], 2)
                     
                     #Only save and send frames in list of desired categories
-                    if(label_category in self.desired_categories):
+                    if(label_category in self.config['categories']):
 
                         # Include date and time of detection in file name
                         frame_time = datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
@@ -219,7 +228,5 @@ class Detector:
             folder_size = sum(os.path.getsize(f'{dir_path}{f}') for f in os.listdir(dir_path))
         
         VideoWriter.release()
-
-        
 
 

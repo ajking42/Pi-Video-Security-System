@@ -4,6 +4,7 @@ import io
 import time
 import os
 import pickle
+import yaml
 from stat import S_ISREG, ST_CTIME, ST_MODE
 from cv2 import imencode
 import firebase_admin
@@ -82,6 +83,17 @@ class Flask_Server:
 
             return 
 
+        @app.route("/update_yaml", methods=['POST'])
+        def update_yaml():
+            config_json = request.json
+
+            print(config_json)
+            ff = open("config.yaml", "w+")
+
+
+            yaml.dump(config_json, ff, allow_unicode=True)  
+
+            return "JSON recieved"
 
 
         
@@ -142,10 +154,14 @@ class Flask_Server:
         # Get device token variable
         with open('deviceToken.txt', 'rb') as f:
                 deviceToken = pickle.load(f)
-        
+
+
+        last_detection = ""
         while True:
             detection = queue.get()
-            if detection != queue.get() or current_time >= next_notification_time:    
+            current_time = datetime.now()
+            if detection != last_detection or current_time > next_notification_time:
+                last_detection = detection
 
                 title = detection + ' detected!'
                 body = current_time.strftime("%m-%d-%Y, %H:%M:%S")
@@ -156,12 +172,13 @@ class Flask_Server:
                 # registration token.
                 response = messaging.send(message)
                 # Response is a message ID string.
-                print('Successfully sent message:', response)
+                print('Sent message:', response)
+                
 
                 # Ensure repeat notification isn't sent for a number of seconds
-                next_notification_time = datetime.now() + timedelta(seconds=10)
+                next_notification_time = datetime.now() + timedelta(seconds=5)
 
-                
+                    
 
 
 

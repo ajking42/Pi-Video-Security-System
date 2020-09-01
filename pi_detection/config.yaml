@@ -1,0 +1,4 @@
+categories:
+- car
+- dog
+model_preference: ssd_mobilenet_v3_small
