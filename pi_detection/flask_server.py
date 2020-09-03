@@ -3,6 +3,7 @@ from PIL import Image
 import io
 import time
 import os
+import signal
 import pickle
 import yaml
 from stat import S_ISREG, ST_CTIME, ST_MODE
@@ -13,7 +14,8 @@ from datetime import datetime, timedelta
 from multiprocessing import Process, Queue
 
 class Flask_Server: 
-    deviceToken = ""
+    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader) 
+
 
     # Start server running
     def start(self, queue1, queue2):
@@ -73,15 +75,15 @@ class Flask_Server:
             # the equivalent file
             video_path = f"video_storage/{video_url}"
             
-            os.system(f"ffmpeg -i {video_path}.mp4 -vcodec libx264 {video_path}.mp4")
-            return send_from_directory('video_storage', video_url, as_attachment=True)
+            os.system(f"ffmpeg -i {video_path} -vcodec libx264 {video_path}.mp4")
+            return send_from_directory('video_storage/', video_url, as_attachment=True)
         
 
 
         @app.route("/detection_storage/<image_url>", methods=['GET', 'POST'])
         def detection_storage(image_url):
 
-            return 
+            return send_from_directory('detection_storage/', image_url, as_attachment=True)
 
         @app.route("/update_yaml", methods=['POST'])
         def update_yaml():
@@ -92,6 +94,11 @@ class Flask_Server:
 
 
             yaml.dump(config_json, ff, allow_unicode=True)  
+
+            print('Terminating server...')
+
+            os.kill(os.getpid(), signal.SIGINT)
+            
 
             return "JSON recieved"
 
@@ -176,7 +183,7 @@ class Flask_Server:
                 
 
                 # Ensure repeat notification isn't sent for a number of seconds
-                next_notification_time = datetime.now() + timedelta(seconds=5)
+                next_notification_time = datetime.now() + timedelta(seconds=self.config['notify_period'])
 
                     
 

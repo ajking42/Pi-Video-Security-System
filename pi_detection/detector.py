@@ -193,7 +193,7 @@ class Detector:
         
         # while folder is larger than specified size, delete oldest frames
         i = 0
-        while(folder_size > 1e+7):
+        while(folder_size > self.config['max_imstorage']*1000):
             oldest_file = sorted_detections[i]
             i = i + 1
             os.remove(f'{dir_path}{oldest_file}')
@@ -221,7 +221,7 @@ class Detector:
         
         # while folder is larger than specified size, delete oldest videos
         i = 0
-        while(folder_size > 1e+7):
+        while(folder_size > self.config['max_vidstorage']*1000):
             oldest_file = sorted_files[i]
             i = i + 1
             os.remove(f'{dir_path}{oldest_file}')

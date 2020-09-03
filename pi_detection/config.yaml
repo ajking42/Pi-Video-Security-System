@@ -1,4 +1,8 @@
 categories:
 - car
+- person
 - dog
-model_preference: ssd_mobilenet_v3_small
+max_imstorage: 100
+max_vidstorage: 100
+model_preference: ssd_mobilenet_v3_large
+notify_period: 5
