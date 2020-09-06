@@ -10,8 +10,7 @@ from picamera import PiCamera
 from threading import Thread
 from queue import Queue
 import time
-from datetime import datetime        dir_path = f'{self.directory}detection_storage/'
-
+from datetime import datetime      
 
 class Detector:
     config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)  
