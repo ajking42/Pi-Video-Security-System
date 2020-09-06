@@ -88,6 +88,7 @@ class Flask_Server:
         @app.route("/update_yaml", methods=['POST'])
         def update_yaml():
             config_json = request.json
+            config_json['directory'] = config_json['directory'].replace('-', '/')
 
             print(config_json)
             ff = open("config.yaml", "w+")

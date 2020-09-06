@@ -2,6 +2,7 @@ categories:
 - car
 - person
 - dog
+directory: /home/pi/
 max_imstorage: 100
 max_vidstorage: 100
 model_preference: ssd_mobilenet_v3_large

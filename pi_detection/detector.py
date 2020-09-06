@@ -10,7 +10,8 @@ from picamera import PiCamera
 from threading import Thread
 from queue import Queue
 import time
-from datetime import datetime
+from datetime import datetime        dir_path = f'{self.directory}detection_storage/'
+
 
 class Detector:
     config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)  
@@ -150,13 +151,14 @@ class Detector:
             
             cv2.putText(recorded_frame, datetime.now().strftime("%m-%d-%Y, %H:%M:%S"),(10, self.input_height-10),cv2.FONT_HERSHEY_SIMPLEX,0.25,(255,255,0),1,cv2.LINE_AA)
 
-            #Show the frame - TODO: to be taken out in final implementation
+            
             out.write(recorded_frame)
-                     
-
+            #Show the frame - TODO: to be taken out in final implementation
             cv2.imshow('frame', recorded_frame)
-            self.queue1.put(frame)
 
+            if self.queue1.full():
+                self.queue1.get()
+            self.queue1.put(frame)
 
             #Reset picamera
             rawCapture.truncate(0)

@@ -14,7 +14,7 @@ if __name__ == '__main__':
 
     # Initialise Queues to allow communication between processes
     # (not currently in use)
-    detector_q = Queue()
+    detector_q = Queue(maxsize=10)
     flask_q = Queue()
 
     #Initialise detector and server
