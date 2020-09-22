@@ -22,10 +22,9 @@ class Flask_Server:
         app = Flask(__name__)
 
         
-
         @app.route("/", methods = ['GET', 'POST'])
-        @app.route("/home", methods = ['GET', 'POST'])
-        def home(): 
+        @app.route("/detections_list", methods = ['GET', 'POST'])
+        def detections_list(): 
             # Currently used to retrieve a list of detection frames in order of
             # file creation date
 
@@ -116,7 +115,7 @@ class Flask_Server:
 
             return send_file(image_path, mimetype='image/PNG')
 
-            
+        
 
         @app.route("/streaming")
         def streaming():
@@ -125,7 +124,7 @@ class Flask_Server:
 
 
         @app.route("/setToken", methods=['GET','POST'])
-        def setToken():
+        def set_token():
             # Saves the token required by firebase cloud messaging
             deviceToken = request.form['token']
             print(deviceToken)
@@ -182,7 +181,6 @@ class Flask_Server:
                 # Response is a message ID string.
                 print('Sent message:', response)
                 
-
                 # Ensure repeat notification isn't sent for a number of seconds
                 next_notification_time = datetime.now() + timedelta(seconds=self.config['notify_period'])
 

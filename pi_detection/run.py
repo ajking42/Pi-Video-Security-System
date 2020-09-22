@@ -13,28 +13,28 @@ if __name__ == '__main__':
 
 
     # Initialise Queues to allow communication between processes
-    # (not currently in use)
-    detector_q = Queue(maxsize=10)
-    flask_q = Queue()
+    streaming_q = Queue(maxsize=10)
+    notification_q = Queue()
 
-    #Initialise detector and server
-    detector = Detector(detector_q, flask_q)
+    # Initialise detector and server
+    detector = Detector(streaming_q, notification_q)
     server = Flask_Server()
 
     
-    #Run server on separate process
-    detection_process = Process(target=detector.detect, args=(False,))
+    # Run detector on separate process
+    detection_process = Process(target=detector.detect)
     detection_process.daemon = True
     detection_process.start()
 
-    # Notifier process to constantly check for new detections
-    notifier = Process(target=server.notification, args=(flask_q,))
+    # Run Notifier process to constantly check for new detections
+    notifier = Process(target=server.notification, args=(notification_q,))
     notifier.daemon = True
     notifier.start()
 
+    #Start Server
+    server.start(streaming_q, notification_q)
 
-    #Start detector
-    server.start(detector_q, flask_q)
+
     print('Server terminated')
 
     detection_process.terminate()

@@ -1,9 +1,14 @@
+absolute_frame_count: 100
+approx_secs: 30
 categories:
 - car
 - person
 - dog
 directory: /home/pi/
-max_imstorage: 100
-max_vidstorage: 100
+frame_count_secs: absolute
+max_imstorage: 10000
+max_vidstorage: 10000
+min_score: 0.6
 model_preference: ssd_mobilenet_v3_large
 notify_period: 5
+variations_seed_native_stored: true

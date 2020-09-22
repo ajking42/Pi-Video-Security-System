@@ -10,24 +10,23 @@ from picamera import PiCamera
 from threading import Thread
 from queue import Queue
 import time
-from datetime import datetime        dir_path = f'{self.directory}detection_storage/'
+from datetime import datetime        
 
 
 class Detector:
-    config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader)  
-
+     
     
-    
-
     def __init__(self, q1, q2):
-
-       
+        self.config = yaml.load(open('config.yaml'), Loader=yaml.FullLoader) 
 
         # Initialise Queues          
         self.queue1 = q1
         self.queue2 = q2
         
-        print('Initialising detector')
+        print('Detector initilised')
+    
+    def initialise_tflite_model(self):
+        print('Initialising tflite model...')
         # Path to frozen detection graph. This is the actual model that is used for the object detection.
         MODEL_NAME = self.config['model_preference']
         print(F'Running model: {MODEL_NAME}')
@@ -57,21 +56,22 @@ class Detector:
         self.input_width = self.input_details[0]['shape'][2]
 
        
-        print('Detector initilised')
         
 
-    def detect(self, frame_count_bool):
+    def detect(self):
+        self.initialise_tflite_model()
         # Initialise the videostream 
         resolution = (self.input_width, self.input_height)
-        print('Initilising PiCamera')
+        print('Initilising PiCamera...')
         camera = PiCamera()
         camera.resolution = resolution
         frame_rate_calc = 1
         freq = cv2.getTickFrequency()
         rawCapture = PiRGBArray(camera, size=resolution)
         time.sleep(2)
-        print('Starting detection loop')
+        print('Starting detection loop...')
         frame_rate_list = []
+        frame_count_bool = self.config['frame_count_secs']
         
         out = cv2.VideoWriter(f'video_storage/{datetime.now().strftime("%m-%d-%Y, %H:%M:%S")}.mp4',cv2.VideoWriter_fourcc('m','p','4','v'), 8, (self.input_width,self.input_height))
         avg_fps = 1
@@ -79,8 +79,8 @@ class Detector:
         for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
             t1 = cv2.getTickCount()
             # If user chooses to calculate video length by number of frames
-            if frame_count >= 100 and frame_count_bool == False:
-                self.saveVideo(out)
+            if frame_count >= self.config['absolute_frame_count'] and frame_count_bool == 'absolute':
+                self.save_video(out)
                 print(frame_count)
                 frame_count = 1
                 avg_fps = sum(frame_rate_list)/len(frame_rate_list)
@@ -89,8 +89,8 @@ class Detector:
                 out = cv2.VideoWriter(f'video_storage/{datetime.now().strftime("%m-%d-%Y, %H:%M:%S")}.mp4',cv2.VideoWriter_fourcc('m','p','4','v'), avg_fps, (self.input_width,self.input_height))
 
             # If user wishes to calculate video length by approximated seconds 
-            if frame_count >= avg_fps*30 and frame_count_bool == True:
-                self.saveVideo(out)
+            if frame_count >= avg_fps*self.config['approx_secs'] and frame_count_bool == 'approx':
+                self.save_video(out)
                 print(frame_count)
                 frame_count = 1
                 avg_fps = sum(frame_rate_list)/len(frame_rate_list)
@@ -120,7 +120,7 @@ class Detector:
             scores = self.interpreter.get_tensor(self.output_details[2]['index'])[0]
             #Draw boxes and labels on frame   # Credit to pyimagesearch.com
             for i in range(0, len(classes)):
-                if scores[i] > 0.6:
+                if scores[i] > self.config['min_score']:
                     
                     box = boxes[i]
                     (top, left, bottom, right) = (box * ([height, width, height, width])).astype('int')
@@ -139,7 +139,7 @@ class Detector:
                         frame_time = datetime.now().strftime("%m-%d-%Y, %H:%M:%S")
                         frame_file_name = f'detection_storage/{frame_time} - {label}.png'
 
-                        self.saveFrame(frame_file_name, frame)
+                        self.save_frame(frame_file_name, frame)
 
 
                         # Put category into notification queue
@@ -156,9 +156,7 @@ class Detector:
             #Show the frame - TODO: to be taken out in final implementation
             cv2.imshow('frame', recorded_frame)
 
-            if self.queue1.full():
-                self.queue1.get()
-            self.queue1.put(frame)
+            self.stream_frame(frame)
 
             #Reset picamera
             rawCapture.truncate(0)
@@ -167,7 +165,8 @@ class Detector:
                 cv2.destroyAllWindows()
                 out.release()
                 break
-           #Calculate fps
+
+            #Calculate fps
             t2 = cv2.getTickCount()
             t2 = (t2-t1)/freq
             frame_rate_calc = 1/t2
@@ -176,7 +175,7 @@ class Detector:
             frame_count = frame_count + 1  
 
     
-    def saveFrame(self, frame_file_name, detection_frame):
+    def save_frame(self, frame_file_name, detection_frame):
         dir_path = 'detection_storage/'
 
         detection_file_names = os.listdir(dir_path)
@@ -203,8 +202,14 @@ class Detector:
 
         # write new frame to folder
         cv2.imwrite(frame_file_name, detection_frame)
+    
+    def stream_frame(self, frame):
+        if self.queue1.full():
+            self.queue1.get()
+        self.queue1.put(frame)
+
         
-    def saveVideo(self, VideoWriter):
+    def save_video(self, VideoWriter):
         dir_path = 'video_storage/'
 
         video_file_names = os.listdir(dir_path)
