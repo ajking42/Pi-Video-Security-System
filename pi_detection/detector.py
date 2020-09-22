@@ -10,8 +10,12 @@ from picamera import PiCamera
 from threading import Thread
 from queue import Queue
 import time
+<<<<<<< HEAD
 from datetime import datetime        
 
+=======
+from datetime import datetime      
+>>>>>>> 48c620302a6757473dd1e2789abf077c0fe5f99d
 
 class Detector:
      
