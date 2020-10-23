@@ -9,6 +9,6 @@ frame_count_secs: absolute
 max_imstorage: 10000
 max_vidstorage: 10000
 min_score: 0.6
-model_preference: ssd_mobilenet_v3_large
+model_preference: ssd_mobilenet_v3_small
 notify_period: 5
 variations_seed_native_stored: true

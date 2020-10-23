@@ -10,12 +10,8 @@ from picamera import PiCamera
 from threading import Thread
 from queue import Queue
 import time
-<<<<<<< HEAD
 from datetime import datetime        
 
-=======
-from datetime import datetime      
->>>>>>> 48c620302a6757473dd1e2789abf077c0fe5f99d
 
 class Detector:
      
@@ -58,6 +54,7 @@ class Detector:
         # Find required image size for model input
         self.input_height = self.input_details[0]['shape'][1]
         self.input_width = self.input_details[0]['shape'][2]
+        print(self.input_height, self.input_width)
 
        
         

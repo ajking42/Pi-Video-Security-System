@@ -164,6 +164,8 @@ class Flask_Server:
 
 
         last_detection = ""
+
+        # Continuously check queue for new detected classes
         while True:
             detection = queue.get()
             current_time = datetime.now()
@@ -172,11 +174,10 @@ class Flask_Server:
 
                 title = detection + ' detected!'
                 body = current_time.strftime("%m-%d-%Y, %H:%M:%S")
-                # See documentation on defining a message payload.
+
                 message = messaging.Message(notification=messaging.Notification(title=title, body=body), token=deviceToken)
 
-                # Send a message to the device corresponding to the provided
-                # registration token.
+                # Send a message to the device corresponding to the provided registration token.
                 response = messaging.send(message)
                 # Response is a message ID string.
                 print('Sent message:', response)
